@@ -27,7 +27,7 @@
 
 #ifdef STM32_DEVICE
 #include <application.h>
-#define bit(b) (1UL << (b))    // Taken directly from Arduino.h
+#define bit(b) (1UL << (b)) // Taken directly from Arduino.h
 #else
 #include <Arduino.h>
 #include <IPAddress.h>
@@ -44,7 +44,7 @@
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_WEBSOCKETS(...) DEBUG_ESP_PORT.printf(__VA_ARGS__)
 #else
-//#define DEBUG_WEBSOCKETS(...) os_printf( __VA_ARGS__ )
+#define DEBUG_WEBSOCKETS(...) os_printf(__VA_ARGS__)
 #endif
 #endif
 
@@ -105,7 +105,7 @@
 #endif
 
 // Includes and defined based on Network Type
-#if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
+#if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
 
 // Note:
 //   No SSL/WSS support for client in Async mode
@@ -127,7 +127,7 @@
 #define WEBSOCKETS_NETWORK_CLASS AsyncTCPbuffer
 #define WEBSOCKETS_NETWORK_SERVER_CLASS AsyncServer
 
-#elif(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
+#elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266)
 
 #if !defined(ESP8266) && !defined(ESP31B)
 #error "network type ESP8266 only possible on the ESP mcu!"
@@ -142,7 +142,7 @@
 #define WEBSOCKETS_NETWORK_SSL_CLASS WiFiClientSecure
 #define WEBSOCKETS_NETWORK_SERVER_CLASS WiFiServer
 
-#elif(WEBSOCKETS_NETWORK_TYPE == NETWORK_W5100)
+#elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_W5100)
 
 #ifdef STM32_DEVICE
 #define WEBSOCKETS_NETWORK_CLASS TCPClient
@@ -154,13 +154,13 @@
 #define WEBSOCKETS_NETWORK_SERVER_CLASS EthernetServer
 #endif
 
-#elif(WEBSOCKETS_NETWORK_TYPE == NETWORK_ENC28J60)
+#elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_ENC28J60)
 
 #include <UIPEthernet.h>
 #define WEBSOCKETS_NETWORK_CLASS UIPClient
 #define WEBSOCKETS_NETWORK_SERVER_CLASS UIPServer
 
-#elif(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32)
+#elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32)
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -168,7 +168,7 @@
 #define WEBSOCKETS_NETWORK_SSL_CLASS WiFiClientSecure
 #define WEBSOCKETS_NETWORK_SERVER_CLASS WiFiServer
 
-#elif(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32_ETH)
+#elif (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP32_ETH)
 
 #include <ETH.h>
 #define WEBSOCKETS_NETWORK_CLASS WiFiClient
@@ -189,13 +189,15 @@
 #define WEBSOCKETS_STRING(var) var
 #endif
 
-typedef enum {
+typedef enum
+{
     WSC_NOT_CONNECTED,
     WSC_HEADER,
     WSC_CONNECTED
 } WSclientsStatus_t;
 
-typedef enum {
+typedef enum
+{
     WStype_ERROR,
     WStype_DISCONNECTED,
     WStype_CONNECTED,
@@ -209,18 +211,20 @@ typedef enum {
     WStype_PONG,
 } WStype_t;
 
-typedef enum {
-    WSop_continuation = 0x00,    ///< %x0 denotes a continuation frame
-    WSop_text         = 0x01,    ///< %x1 denotes a text frame
-    WSop_binary       = 0x02,    ///< %x2 denotes a binary frame
-                                 ///< %x3-7 are reserved for further non-control frames
-    WSop_close = 0x08,           ///< %x8 denotes a connection close
-    WSop_ping  = 0x09,           ///< %x9 denotes a ping
-    WSop_pong  = 0x0A            ///< %xA denotes a pong
-                                 ///< %xB-F are reserved for further control frames
+typedef enum
+{
+    WSop_continuation = 0x00, ///< %x0 denotes a continuation frame
+    WSop_text = 0x01,         ///< %x1 denotes a text frame
+    WSop_binary = 0x02,       ///< %x2 denotes a binary frame
+                              ///< %x3-7 are reserved for further non-control frames
+    WSop_close = 0x08,        ///< %x8 denotes a connection close
+    WSop_ping = 0x09,         ///< %x9 denotes a ping
+    WSop_pong = 0x0A          ///< %xA denotes a pong
+                              ///< %xB-F are reserved for further control frames
 } WSopcode_t;
 
-typedef struct {
+typedef struct
+{
     bool fin;
     bool rsv1;
     bool rsv2;
@@ -231,98 +235,100 @@ typedef struct {
 
     size_t payloadLen;
 
-    uint8_t * maskKey;
+    uint8_t *maskKey;
 } WSMessageHeader_t;
 
-typedef struct {
-    uint8_t num;    ///< connection number
+typedef struct
+{
+    uint8_t num; ///< connection number
 
     WSclientsStatus_t status;
 
-    WEBSOCKETS_NETWORK_CLASS * tcp;
+    WEBSOCKETS_NETWORK_CLASS *tcp;
 
-    bool isSocketIO;    ///< client for socket.io server
+    bool isSocketIO; ///< client for socket.io server
 
 #if defined(HAS_SSL)
-    bool isSSL;    ///< run in ssl mode
-    WEBSOCKETS_NETWORK_SSL_CLASS * ssl;
+    bool isSSL; ///< run in ssl mode
+    WEBSOCKETS_NETWORK_SSL_CLASS *ssl;
 #endif
 
-    String cUrl;       ///< http url
-    uint16_t cCode;    ///< http code
+    String cUrl;    ///< http url
+    uint16_t cCode; ///< http code
 
-    bool cIsClient = false;    ///< will be used for masking
-    bool cIsUpgrade;           ///< Connection == Upgrade
-    bool cIsWebsocket;         ///< Upgrade == websocket
+    bool cIsClient = false; ///< will be used for masking
+    bool cIsUpgrade;        ///< Connection == Upgrade
+    bool cIsWebsocket;      ///< Upgrade == websocket
 
-    String cSessionId;     ///< client Set-Cookie (session id)
-    String cKey;           ///< client Sec-WebSocket-Key
-    String cAccept;        ///< client Sec-WebSocket-Accept
-    String cProtocol;      ///< client Sec-WebSocket-Protocol
-    String cExtensions;    ///< client Sec-WebSocket-Extensions
-    uint16_t cVersion;     ///< client Sec-WebSocket-Version
+    String cSessionId;  ///< client Set-Cookie (session id)
+    String cKey;        ///< client Sec-WebSocket-Key
+    String cAccept;     ///< client Sec-WebSocket-Accept
+    String cProtocol;   ///< client Sec-WebSocket-Protocol
+    String cExtensions; ///< client Sec-WebSocket-Extensions
+    uint16_t cVersion;  ///< client Sec-WebSocket-Version
 
-    uint8_t cWsRXsize;                                ///< State of the RX
-    uint8_t cWsHeader[WEBSOCKETS_MAX_HEADER_SIZE];    ///< RX WS Message buffer
+    uint8_t cWsRXsize;                             ///< State of the RX
+    uint8_t cWsHeader[WEBSOCKETS_MAX_HEADER_SIZE]; ///< RX WS Message buffer
     WSMessageHeader_t cWsHeaderDecode;
 
-    String base64Authorization;    ///< Base64 encoded Auth request
-    String plainAuthorization;     ///< Base64 encoded Auth request
+    String base64Authorization; ///< Base64 encoded Auth request
+    String plainAuthorization;  ///< Base64 encoded Auth request
 
     String extraHeaders;
 
-    bool cHttpHeadersValid;           ///< non-websocket http header validity indicator
-    size_t cMandatoryHeadersCount;    ///< non-websocket mandatory http headers present count
+    bool cHttpHeadersValid;        ///< non-websocket http header validity indicator
+    size_t cMandatoryHeadersCount; ///< non-websocket mandatory http headers present count
 
     bool pongReceived;
-    uint32_t pingInterval;             // how often ping will be sent, 0 means "heartbeat is not active"
-    uint32_t lastPing;                 // millis when last pong has been received
-    uint32_t pongTimeout;              // interval in millis after which pong is considered to timeout
-    uint8_t disconnectTimeoutCount;    // after how many subsequent pong timeouts discconnect will happen, 0 means "do not disconnect"
-    uint8_t pongTimeoutCount;          // current pong timeout count
+    uint32_t pingInterval;          // how often ping will be sent, 0 means "heartbeat is not active"
+    uint32_t lastPing;              // millis when last pong has been received
+    uint32_t pongTimeout;           // interval in millis after which pong is considered to timeout
+    uint8_t disconnectTimeoutCount; // after how many subsequent pong timeouts discconnect will happen, 0 means "do not disconnect"
+    uint8_t pongTimeoutCount;       // current pong timeout count
 
-#if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
-    String cHttpLine;    ///< HTTP header lines
+#if (WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
+    String cHttpLine; ///< HTTP header lines
 #endif
 
 } WSclient_t;
 
-class WebSockets {
-  protected:
+class WebSockets
+{
+protected:
 #ifdef __AVR__
-    typedef void (*WSreadWaitCb)(WSclient_t * client, bool ok);
+    typedef void (*WSreadWaitCb)(WSclient_t *client, bool ok);
 #else
-    typedef std::function<void(WSclient_t * client, bool ok)> WSreadWaitCb;
+    typedef std::function<void(WSclient_t *client, bool ok)> WSreadWaitCb;
 #endif
 
-    virtual void clientDisconnect(WSclient_t * client)  = 0;
-    virtual bool clientIsConnected(WSclient_t * client) = 0;
+    virtual void clientDisconnect(WSclient_t *client) = 0;
+    virtual bool clientIsConnected(WSclient_t *client) = 0;
 
-    void clientDisconnect(WSclient_t * client, uint16_t code, char * reason = NULL, size_t reasonLen = 0);
+    void clientDisconnect(WSclient_t *client, uint16_t code, char *reason = NULL, size_t reasonLen = 0);
 
-    virtual void messageReceived(WSclient_t * client, WSopcode_t opcode, uint8_t * payload, size_t length, bool fin) = 0;
+    virtual void messageReceived(WSclient_t *client, WSopcode_t opcode, uint8_t *payload, size_t length, bool fin) = 0;
 
-    uint8_t createHeader(uint8_t * buf, WSopcode_t opcode, size_t length, bool mask, uint8_t maskKey[4], bool fin);
-    bool sendFrameHeader(WSclient_t * client, WSopcode_t opcode, size_t length = 0, bool fin = true);
-    bool sendFrame(WSclient_t * client, WSopcode_t opcode, uint8_t * payload = NULL, size_t length = 0, bool fin = true, bool headerToPayload = false);
+    uint8_t createHeader(uint8_t *buf, WSopcode_t opcode, size_t length, bool mask, uint8_t maskKey[4], bool fin);
+    bool sendFrameHeader(WSclient_t *client, WSopcode_t opcode, size_t length = 0, bool fin = true);
+    bool sendFrame(WSclient_t *client, WSopcode_t opcode, uint8_t *payload = NULL, size_t length = 0, bool fin = true, bool headerToPayload = false);
 
-    void headerDone(WSclient_t * client);
+    void headerDone(WSclient_t *client);
 
-    void handleWebsocket(WSclient_t * client);
+    void handleWebsocket(WSclient_t *client);
 
-    bool handleWebsocketWaitFor(WSclient_t * client, size_t size);
-    void handleWebsocketCb(WSclient_t * client);
-    void handleWebsocketPayloadCb(WSclient_t * client, bool ok, uint8_t * payload);
+    bool handleWebsocketWaitFor(WSclient_t *client, size_t size);
+    void handleWebsocketCb(WSclient_t *client);
+    void handleWebsocketPayloadCb(WSclient_t *client, bool ok, uint8_t *payload);
 
-    String acceptKey(String & clientKey);
-    String base64_encode(uint8_t * data, size_t length);
+    String acceptKey(String &clientKey);
+    String base64_encode(uint8_t *data, size_t length);
 
-    bool readCb(WSclient_t * client, uint8_t * out, size_t n, WSreadWaitCb cb);
-    virtual size_t write(WSclient_t * client, uint8_t * out, size_t n);
-    size_t write(WSclient_t * client, const char * out);
+    bool readCb(WSclient_t *client, uint8_t *out, size_t n, WSreadWaitCb cb);
+    virtual size_t write(WSclient_t *client, uint8_t *out, size_t n);
+    size_t write(WSclient_t *client, const char *out);
 
-    void enableHeartbeat(WSclient_t * client, uint32_t pingInterval, uint32_t pongTimeout, uint8_t disconnectTimeoutCount);
-    void handleHBTimeout(WSclient_t * client);
+    void enableHeartbeat(WSclient_t *client, uint32_t pingInterval, uint32_t pongTimeout, uint8_t disconnectTimeoutCount);
+    void handleHBTimeout(WSclient_t *client);
 };
 
 #ifndef UNUSED
