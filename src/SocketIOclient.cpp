@@ -52,6 +52,11 @@ void SocketIOclient::enableHeartbeat(uint32_t pingInterval, uint32_t pongTimeout
     WebSocketsClient::enableHeartbeat(pingInterval, pongTimeout, disconnectTimeoutCount);
 }
 
+void SocketIOclient::disableHeartbeat()
+{
+    WebSocketsClient::disableHeartbeat();
+}
+
 /**
  * set callback function
  * @param cbEvent SocketIOclientEvent
@@ -202,35 +207,11 @@ void SocketIOclient::handleCbEvent(WStype_t type, uint8_t *payload, size_t lengt
                 break;
             }
             case sIOtype_CONNECT:
-            {
-                DEBUG_WEBSOCKETS("[wsIOc] get connect (%d): %s\n", lData, data);
-                break;
-            }
             case sIOtype_DISCONNECT:
-            {
-                DEBUG_WEBSOCKETS("[wsIOc] get disconnect (%d): %s\n", lData, data);
-                break;
-            }
             case sIOtype_ACK:
-            {
-                DEBUG_WEBSOCKETS("[wsIOc] get ack (%d): %s\n", lData, data);
-                break;
-            }
             case sIOtype_ERROR:
-            {
-                DEBUG_WEBSOCKETS("[wsIOc] get error (%d): %s\n", lData, data);
-                break;
-            }
             case sIOtype_BINARY_EVENT:
-            {
-                DEBUG_WEBSOCKETS("[wsIOc] get bin_event (%d): %s\n", lData, data);
-                break;
-            }
             case sIOtype_BINARY_ACK:
-            {
-                DEBUG_WEBSOCKETS("[wsIOc] get bin_ack (%d): %s\n", lData, data);
-                break;
-            }
             default:
             {
                 DEBUG_WEBSOCKETS("[wsIOc] Socket.IO Message Type %d %c (%02X) is not implemented\n", ioType, ioType, ioType);

@@ -67,8 +67,9 @@ public:
     bool sendEVENT(const char *payload, size_t length = 0);
     bool sendEVENT(String &payload);
 
-    void enableHeartbeat(uint32_t pingInterval, uint32_t pongTimeout, uint8_t disconnectTimeoutCount);
     void setReconnectInterval(unsigned long time);
+    void enableHeartbeat(uint32_t pingInterval, uint32_t pongTimeout, uint8_t disconnectTimeoutCount);
+    void disableHeartbeat();
 
     void loop(void);
 
